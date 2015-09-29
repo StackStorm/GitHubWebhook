@@ -5,7 +5,7 @@ import hmac
 import hashlib
 from OpenSSL import SSL
 
-class WebhookSensor(Sensor):
+class GitHubWebhookSensor(Sensor):
     """
     * self._sensor_service
        - provides utilities like
@@ -21,7 +21,7 @@ class WebhookSensor(Sensor):
         self._endpoints = self._config['endpoints']
         self._secret = self._config['secret']
         self.app = Flask(__name__)
-        self.trigger_ref = "webhooks.github_event"
+        self.trigger_ref = "GitHubWebhook.github_event"
         self.log = self._sensor_service.get_logger(__name__)
 
         @self.app.route('/status')
