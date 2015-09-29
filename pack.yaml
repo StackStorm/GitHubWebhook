@@ -1,0 +1,6 @@
+---
+name: githubwebhook
+description: GitHub webhook sensor
+version: 0.0.1
+author: Patrick Hoolboom
+email: patrick@stackstorm.com
