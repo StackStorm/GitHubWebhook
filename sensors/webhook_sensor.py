@@ -67,7 +67,6 @@ class GitHubWebhookSensor(Sensor):
 
                 # HMAC requires its key to be bytes, but data is strings.
                 mac = hmac.new(self._secret, request.data, hashlib.sha1).hexdigest()
-                self.log.info("%s %s" % (mac, signature))
                 if not mac == signature:
                     msg = json.dumps({"response":"authfailed"})
                     abort(make_response(msg, 403))
