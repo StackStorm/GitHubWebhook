@@ -5,7 +5,7 @@ import hmac
 import hashlib
 from OpenSSL import SSL
 
-class WebhookSensor(Sensor):
+class GitHubWebhookSensor(Sensor):
     """
     * self._sensor_service
        - provides utilities like
@@ -21,7 +21,7 @@ class WebhookSensor(Sensor):
         self._endpoints = self._config['endpoints']
         self._secret = self._config['secret']
         self.app = Flask(__name__)
-        self.trigger_ref = "webhooks.github_event"
+        self.trigger_ref = "GitHubWebhook.github_event"
         self.log = self._sensor_service.get_logger(__name__)
 
         @self.app.route('/status')
@@ -39,13 +39,20 @@ class WebhookSensor(Sensor):
             # Store the IP address blocks that github uses for hook requests.
             hook_blocks = requests.get('https://api.github.com/meta').json()['hooks']
 
+            ip_address = payload['headers']['X-Forwarded-For']
             # Check if the POST request if from github.com
             for block in hook_blocks:
-                ip = ipaddress.ip_address(u'%s' % payload['headers']['X-Forwarded-For'])
+                ip = ipaddress.ip_address(u'%s' % ip_address)
                 if ipaddress.ip_address(ip) in ipaddress.ip_network(block):
                     break #the remote_addr is within the network range of github
             else:
-                abort(make_response(json.dumps({"response":"authfailed"}),403))
+                if not request.headers.get('ST2-Event', None):
+                    self.log.info("Connection attempt from incorrect ip: %s" % ip_address)
+                    abort(make_response(json.dumps({"response":"authfailed","ip":ip_address}),403))
+                else:
+                    payload['body'] = {'event_type': request.headers.get('ST2-Event')}
+                    response = self._sensor_service.dispatch(self.trigger_ref, payload)
+                    return json.dumps({"response":"triggerposted"}) 
  
             if request.headers.get('X-GitHub-Event') == "ping":
                 return json.dumps({'response': 'ACK'})
@@ -60,11 +67,13 @@ class WebhookSensor(Sensor):
 
                 # HMAC requires its key to be bytes, but data is strings.
                 mac = hmac.new(self._secret, request.data, hashlib.sha1).hexdigest()
+                self.log.info("%s %s" % (mac, signature))
                 if not mac == signature:
                     msg = json.dumps({"response":"authfailed"})
                     abort(make_response(msg, 403))
             
             response = self._sensor_service.dispatch(self.trigger_ref, payload)
+            self.log.info(json.dumps(response))
             return json.dumps({"response":"triggerposted"})
 
     def run(self):
