@@ -68,7 +68,7 @@ class WebhookSensor(Sensor):
             return json.dumps({"response":"triggerposted"})
 
     def run(self):
-        self.app.run(host=self.host,port=self.port,debug=True)
+        self.app.run(host=self.host,port=self.port,debug=True, threaded=True)
 
     def cleanup(self):
         # This is called when the st2 system goes down. You can perform cleanup operations like
