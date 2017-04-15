@@ -5,7 +5,7 @@ import hmac
 import hashlib
 from OpenSSL import SSL
 
-class WebhookSensor(Sensor):
+class GitHubWebhookSensor(Sensor):
     """
     * self._sensor_service
        - provides utilities like
