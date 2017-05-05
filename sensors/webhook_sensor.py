@@ -19,7 +19,7 @@ class GitHubWebhookSensor(Sensor):
         self.host = self._config['host']
         self.port = self._config['port']
         self._endpoints = self._config['endpoints']
-        self._secret = self._config['secret']
+        self._secret = self._config['secret'].encode('utf-8')
         self.app = Flask(__name__)
         self.trigger_ref = "webhooks.github_event"
         self.log = self._sensor_service.get_logger(__name__)
@@ -89,15 +89,7 @@ class GitHubWebhookSensor(Sensor):
         self.add_trigger(trigger)
 
     def remove_trigger(self, trigger):
-        id = trigger['id']
-
-        try:
-            job_id = self._jobs[id]
-        except KeyError:
-            self._log.info('Job not found: %s', id)
-            return
-
-        self._scheduler.remove_job(job_id)
+        pass
 
     def _get_trigger_type(self, ref):
         pass
