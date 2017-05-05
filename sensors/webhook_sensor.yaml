@@ -5,11 +5,11 @@
   trigger_types:
     -
       name: "github_event"
-      description: "An example trigger."
+      description: "Github push event"
       payload_schema:
         type: "object"
         properties:
-          executed_at:
-            type: "string"
-            format: "date-time"
-            default: "2014-07-30 05:04:24.578325"
+          headers:
+            type: "object"
+          body:
+            type: "object"
