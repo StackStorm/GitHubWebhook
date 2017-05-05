@@ -21,7 +21,7 @@ class GitHubWebhookSensor(Sensor):
         self._endpoints = self._config['endpoints']
         self._secret = self._config['secret'].encode('utf-8')
         self.app = Flask(__name__)
-        self.trigger_ref = "webhooks.github_event"
+        self.trigger_ref = "githubwebhook.github_event"
         self.log = self._sensor_service.get_logger(__name__)
 
         @self.app.route('/status')
