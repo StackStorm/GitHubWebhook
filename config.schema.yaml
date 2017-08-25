@@ -1,0 +1,20 @@
+---
+  host:
+    description: FQDN or IP address to host the flask app for the sensor
+    type: string
+    default: 0.0.0.0
+  port:
+    description: Port that the flask app is listening on
+    type: integer
+    default: 8642
+  endpoints:
+    description: List of webhook endpoints that sensor supports
+    type: array
+    items:
+      type: string
+    default:
+      - "github/events"
+  secret:
+    description: Key to secure the endpoints
+    type: string
+    default: ""
